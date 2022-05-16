@@ -275,7 +275,7 @@ Oled.prototype._drawChar = function(byteArray, charHeight, size, sync) {
       }
     }
   }
-         var displaySeq = [         var displaySeq = [|}
+}
 
 // get character bytes from the supplied font object in order to send to framebuffer
 Oled.prototype._readCharBytes = function(byteArray, charHeight) {

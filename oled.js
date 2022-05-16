@@ -112,7 +112,7 @@ Oled.prototype._initialise = function() {
 }
 
 // writes both commands and data buffers to this device
-Oled.prototype._transfer = function(type, val, fn) {
+Oled.prototype._transfer = async function(type, val, fn) {
   var control;
   if (type === 'data') {
     control = 0x40;
@@ -133,14 +133,14 @@ Oled.prototype._transfer = function(type, val, fn) {
   }
 
   // send control and actual val
-  sentCount = this.wire.i2cWriteSync(this.ADDRESS, 2, bufferForSend);
+  sentCount = await this.wire.i2cWrite(this.ADDRESS, 2, bufferForSend);
   if(fn) {
     fn();
   }
 }
 
 // read a byte from the oled
-Oled.prototype._readI2C = function(fn) {
+Oled.prototype._readI2C = async function(fn) {
   //For version <6.0.0
   if(typeof Buffer.from == "undefined") {
     this.wire.i2cRead(this.ADDRESS, 0, new Buffer([0]), function(err, bytesRead, data) {
@@ -156,7 +156,7 @@ Oled.prototype._readI2C = function(fn) {
   //For version >=6.0.0
   else {
     var data=[0];
-    this.wire.i2cReadSync(this.ADDRESS, 1, Buffer.from(data));
+    await this.wire.i2cRead(this.ADDRESS, 1, Buffer.from(data));
     fn(data[0]);
   }
 }
@@ -167,8 +167,8 @@ Oled.prototype._waitUntilReady = function(callback) {
   var done,
       oled = this;
 
-  function tick(callback) {
-    oled._readI2C(function(byte) {
+  async function tick(callback) {
+    await oled._readI2C(function(byte) {
       // read the busy byte in the response
       busy = byte >> 7 & 1;
       if (!busy) {
@@ -275,7 +275,7 @@ Oled.prototype._drawChar = function(byteArray, charHeight, size, sync) {
       }
     }
   }
-}
+         var displaySeq = [         var displaySeq = [|}
 
 // get character bytes from the supplied font object in order to send to framebuffer
 Oled.prototype._readCharBytes = function(byteArray, charHeight) {
@@ -309,9 +309,9 @@ Oled.prototype._findCharBuf = function(font, c) {
 }
 
 // send the entire framebuffer to the oled
-Oled.prototype.update = function() {
+Oled.prototype.update = async function() {
   // wait for oled to be ready
-  this._waitUntilReady(function() {
+  this._waitUntilReady(async function() {
     // set the start and endbyte locations for oled display update
     var displaySeq = [
       this.COLUMN_ADDR,
@@ -326,12 +326,12 @@ Oled.prototype.update = function() {
 
     // send intro seq
     for (i = 0; i < displaySeqLen; i += 1) {
-      this._transfer('cmd', displaySeq[i]);
+      await this._transfer('cmd', displaySeq[i]);
     }
 
     // write buffer data
 		var bufferToSend = Buffer.concat([Buffer.from([0x40]), this.buffer]);
-		var sentCount = this.wire.i2cWriteSync(this.ADDRESS, bufferToSend.length, bufferToSend);
+		var sentCount = await this.wire.i2cWrite(this.ADDRESS, bufferToSend.length, bufferToSend);
 
   }.bind(this));
 }

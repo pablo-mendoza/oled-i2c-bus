@@ -78,10 +78,10 @@ var Oled = function(i2c, opts) {
   var screenSize = this.WIDTH + 'x' + this.HEIGHT;
   this.screenConfig = config[screenSize];
 
-  this._initialise();
+  //this._initialise();
 }
 
-Oled.prototype._initialise = function() {
+Oled.prototype._initialise = async function() {
 
   // sequence of bytes to initialise with
   var initSeq = [
@@ -107,7 +107,7 @@ Oled.prototype._initialise = function() {
 
   // write init seq commands
   for (i = 0; i < initSeqLen; i ++) {
-    this._transfer('cmd', initSeq[i]);
+    await this._transfer('cmd', initSeq[i]);
   }
 }
 
@@ -311,6 +311,7 @@ Oled.prototype._findCharBuf = function(font, c) {
 // send the entire framebuffer to the oled
 Oled.prototype.update = async function() {
   // wait for oled to be ready
+	let promise = new Promise(function(resolve, reject) {
   this._waitUntilReady(async function() {
     // set the start and endbyte locations for oled display update
     var displaySeq = [
@@ -333,7 +334,11 @@ Oled.prototype.update = async function() {
 		var bufferToSend = Buffer.concat([Buffer.from([0x40]), this.buffer]);
 		var sentCount = await this.wire.i2cWrite(this.ADDRESS, bufferToSend.length, bufferToSend);
 
+	  resolve()
   }.bind(this));
+	})
+	
+	return promise
 }
 
 // send dim display command to oled

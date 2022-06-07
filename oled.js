@@ -312,7 +312,7 @@ Oled.prototype._findCharBuf = function(font, c) {
 Oled.prototype.update = async function() {
   // wait for oled to be ready
 	let promise = new Promise((resolve, reject) => {
-  this._waitUntilReady(function() {
+  this._waitUntilReady(async function() {
     // set the start and endbyte locations for oled display update
     var displaySeq = [
       this.COLUMN_ADDR,

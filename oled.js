@@ -311,7 +311,7 @@ Oled.prototype._findCharBuf = function(font, c) {
 // send the entire framebuffer to the oled
 Oled.prototype.update = async function() {
   // wait for oled to be ready
-	let promise = new Promise(function(resolve, reject) {
+	let promise = new Promise(() => (resolve, reject) {
   this._waitUntilReady(async () => {
     // set the start and endbyte locations for oled display update
     var displaySeq = [

@@ -332,6 +332,7 @@ Oled.prototype.update = async function() {
 
     // write buffer data
 		var bufferToSend = Buffer.concat([Buffer.from([0x40]), this.buffer]);
+
 		var sentCount = await this.wire.i2cWrite(this.ADDRESS, bufferToSend.length, bufferToSend);
 
 	  resolve()
@@ -356,22 +357,22 @@ Oled.prototype.dimDisplay = function(bool) {
 }
 
 // turn oled off
-Oled.prototype.turnOffDisplay = function() {
+Oled.prototype.turnOffDisplay = async function() {
   this._transfer('cmd', this.DISPLAY_OFF);
 }
 
 // turn oled on
-Oled.prototype.turnOnDisplay = function() {
-  this._transfer('cmd', this.DISPLAY_ON);
+Oled.prototype.turnOnDisplay = async function() {
+  await this._transfer('cmd', this.DISPLAY_ON);
 }
 
 // clear all pixels currently on the display
-Oled.prototype.clearDisplay = function(sync) {
+Oled.prototype.clearDisplay = async function(sync) {
   var immed = (typeof sync === 'undefined') ? true : sync;
   // write off pixels
   this.buffer.fill(0x00);
 	if (immed) {
-		this.update();
+		await this.update();
 	}
 
 }

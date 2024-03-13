@@ -4,7 +4,7 @@
   "description": "NodeJS module for controlling oled devices on the Raspbery Pi (including the SSD1306 OLED screens)",
   "main": "oled.js",
   "devDependencies": {
-    "i2c-bus": "^4.0.1",
+    "i2c-bus": "^5.2.3",
     "oled-font-5x7": "~1.0.0",
     "png-to-lcd": "~1.0.2",
     "pngjs": "^3.3.3",
